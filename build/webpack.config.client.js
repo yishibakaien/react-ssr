@@ -1,18 +1,22 @@
 
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const webpack = require('webpack')
 
 const isDev = process.env.NODE_ENV === 'development'
 
 const config = {
-  // mode: 'development',
+  mode: 'development',
   entry: {
     app: path.join(__dirname, '../src/app.js')
   },
   output: {
     filename: '[name].[hash].js',
     path: path.join(__dirname, '../dist'),
-    publicPath: '/public'
+
+    // 这里要加后面那个 '/' 否则导致热更新 js 加载路径不正确
+    // 但是我这里不加也是可以的。。。
+    publicPath: '/public/'
   },
   module: {
     rules: [
@@ -37,11 +41,17 @@ const config = {
 }
 
 if (isDev) {
+  config.entry = {
+    app: [
+      'react-hot-loader/patch',
+      path.join(__dirname, '../src/app.js')
+    ]
+  }
   config.devServer = {
     host: '0.0.0.0', // 比较安全的本机 ip 兼容性较好，方便与别人联调
     port: '8888',
     contentBase: path.join(__dirname, '../dist'),
-    // hot: true,
+    hot: true,
     overlay: {
       errors: true // 编译时出现错误，网页中显示错误蒙层
     },
@@ -50,6 +60,7 @@ if (isDev) {
       index: '/public/index.html'
     }
   }
+  config.plugins.push(new webpack.HotModuleReplacementPlugin())
 }
 
 module.exports = config

@@ -18,7 +18,7 @@ app.use('/public', express.static(path.join(__dirname, '../dist')))
 
 app.get('*', function(req, res) {
   const appString = ReactSSR.renderToString(serverEntry)
-  const temp = template.replace('<!-- content slot -->', appString)
+  const temp = template.replace('<!-- slot -->', appString)
   res.send(temp)
 })
 
