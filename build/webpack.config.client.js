@@ -2,6 +2,8 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const webpack = require('webpack')
+const webpackMerge = require('webpack-merge')
+const baseConfig = require('./webpack.base')
 
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -11,35 +13,7 @@ const config = {
     app: path.join(__dirname, '../src/app.js')
   },
   output: {
-    filename: '[name].[hash].js',
-    path: path.join(__dirname, '../dist'),
-
-    // 这里要加后面那个 '/' 否则导致热更新 js 加载路径不正确
-    // 但是我这里不加也是可以的。。。
-    publicPath: '/public/'
-  },
-  module: {
-    rules: [
-      {
-        enforce: 'pre',
-        test: /\.(js|jsx)$/,
-        loader: 'eslint-loader',
-        exclude: [
-          path.resolve(__dirname, '../node_modules')
-        ]
-      },
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: [
-          path.join(__dirname, '../node_modules')
-        ]
-      },
-      {
-        test: /\.jsx$/,
-        loader: 'babel-loader'
-      }
-    ]
+    filename: '[name].[hash].js'
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -71,4 +45,4 @@ if (isDev) {
   config.plugins.push(new webpack.HotModuleReplacementPlugin())
 }
 
-module.exports = config
+module.exports = webpackMerge(baseConfig, config)
