@@ -1,5 +1,7 @@
 import React from 'react'
 import reactDom from 'react-dom'
+
+// eslint-disable-next-line
 import { AppContainer } from 'react-hot-loader'
 import App from './App.jsx'
 
@@ -24,6 +26,7 @@ render(App)
  */
 if (module.hot) {
   module.hot.accept('./App.jsx', () => {
+    // eslint-disable-next-line
     const NextApp = require('./App.jsx').default
     render(NextApp)
   })
