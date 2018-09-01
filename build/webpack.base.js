@@ -8,6 +8,9 @@ module.exports = {
     // 但是我这里不加也是可以的。。。
     publicPath: '/public/'
   },
+  resolve: {
+    extensions: ['.js', '.jsx', '.json']
+  },
   module: {
     rules: [
       {
