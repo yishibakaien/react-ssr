@@ -2,14 +2,14 @@ import React from 'react'
 import { observer, inject } from 'mobx-react'
 import PropTypes from 'prop-types'
 
-import { AppState } from '../../store/app.state'
+import { AppState } from '../../store/app-state'
 
 @inject('appState') @observer
 class TopicList extends React.Component {
 
   static defaultProps = {
     appState: {
-      changeName: ''
+      changeName: a => a
     }
   }
 
@@ -37,7 +37,6 @@ class TopicList extends React.Component {
 }
 
 TopicList.propTypes = {
-  // eslint-disable-next-line
   appState: PropTypes.instanceOf(AppState)
 }
 

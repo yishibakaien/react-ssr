@@ -6,7 +6,7 @@ import { Provider } from 'mobx-react'
 import { AppContainer } from 'react-hot-loader'
 
 import App from './views/App'
-import appState from './store/app.state'
+import appState from './store/app-state'
 
 // 服务端渲染不使用 ReactDom.render
 // ReactDom.hydrate(<App />, document.getElementById('root'))

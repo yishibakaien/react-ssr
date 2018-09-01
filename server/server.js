@@ -1,6 +1,8 @@
 const express = require('express')
 const favicon = require('serve-favicon')
 const ReactSSR = require('react-dom/server')
+const bodyParser = require('body-parser')
+const session = require('express-session')
 const fs = require('fs')
 const path = require('path')
 
@@ -8,7 +10,26 @@ const isDev = process.env.NODE_ENV === 'development'
 
 const app = express()
 
+// 把 application/json 格式转换成 URL query 形式
+app.use(bodyParser.json())
+
+app.use(bodyParser.urlencoded({
+  extended: false
+}))
+
+app.use(session({
+  maxAge: 10 * 60 * 1000,
+  name: 'tid', // cookieId 的名字
+  resave: false, // 每次请求是否新生产一个 cookieId
+  saveUninitialized: false,
+  secret: 'yishibakaien' // 用此字符串去加密 cookie 防止浏览器端 cookie 被解密
+}))
+
 app.use(favicon(path.join(__dirname, '../favicon.ico')))
+
+app.use('/api/user', require('./util/handle-login.js'))
+
+app.use('/api', require('./util/proxy.js'))
 
 if (!isDev) {
   /**
@@ -28,7 +49,7 @@ if (!isDev) {
     res.send(temp)
   })
 } else {
-  const devStatic = require('./util/dev.static.js')
+  const devStatic = require('./util/dev-static.js')
   devStatic(app)
 }
 
