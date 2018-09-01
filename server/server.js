@@ -13,6 +13,7 @@ const app = express()
 // 把 application/json 格式转换成 URL query 形式
 app.use(bodyParser.json())
 
+// 创建 application/x-www-form-urlencoded 解析
 app.use(bodyParser.urlencoded({
   extended: false
 }))
