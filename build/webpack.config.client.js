@@ -18,6 +18,10 @@ const config = {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.join(__dirname, '../src/template.html')
+    }),
+    new HtmlWebpackPlugin({
+      template: '!!ejs-compiled-loader!' + path.join(__dirname, '../src/server.template.ejs'),
+      filename: 'server.ejs'
     })
   ]
 }

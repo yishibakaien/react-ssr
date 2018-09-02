@@ -37,14 +37,14 @@ module.exports = function(req, res, next) {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
   }).then(resp => {
-    console.log('then', resp.data)
+    // console.log('then', resp.data)
     if (resp.status === 200) {
       res.send(resp.data)
     } else {
       res.status(resp.status).send(resp.data)
     }
   }).catch(err => {
-    console.log('err', err.response.data)
+    // console.log('err', err.response.data)
     if (err.response) {
       // 服务器错误状态码
       res.status(500).send(err.response.data)

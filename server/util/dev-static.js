@@ -6,14 +6,22 @@ const webpack = require('webpack')
 const MemoryFs = require('memory-fs')
 
 const proxy = require('http-proxy-middleware')
+
+const ejs = require('ejs')
+
+const serialize = require('serialize-javascript')
+
+// 这个包是使用 export 这种形式去开发的
+const asyncBootstrap = require('react-async-bootstrapper')
 const ReactDomServer = require('react-dom/server')
 
+// console.log('asyncBootstrap', asyncBootstrap)
 
 const serverConfig = require('../../build/webpack.config.server')
 
 const getTemplate = () => {
   return new Promise((resolve, reject) => {
-    axios.get('http://localhost:8888/public/index.html')
+    axios.get('http://localhost:8888/public/server.ejs')
       .then(res => {
         resolve(res.data)
       })
@@ -30,6 +38,8 @@ const serverCompliler = webpack(serverConfig)
 serverCompliler.outputFileSystem = mfs
 
 let serverBundle
+let createStoreMap
+
 serverCompliler.watch({}, (err, stats) => {
   if (err) throw err
   stats = stats.toJson()
@@ -49,7 +59,17 @@ serverCompliler.watch({}, (err, stats) => {
 
   // 获取 m 暴露的模块
   serverBundle = m.exports.default
+  createStoreMap = m.exports.createStoreMap
+  // console.log('1serverBundle', serverBundle)
+  // console.log('1createStoreMap', createStoreMap)
 })
+
+const getStoreState = (stores) => {
+  return Object.keys(stores).reduce((result, storeName) => {
+    result[storeName] = stores[storeName].toJson()
+    return result
+  }, {})
+}
 
 module.exports = function(app) {
 
@@ -60,8 +80,33 @@ module.exports = function(app) {
 
   app.get('*', function(req, res) {
     getTemplate().then(template => {
-      const content = ReactDomServer.renderToString(serverBundle)
-      res.send(template.replace('<!-- slot -->', content))
+
+      const routerContext = {}
+      // console.log('2serverBundle', serverBundle)
+      // console.log('2createStoreMap', createStoreMap)
+      const stores = createStoreMap()
+      const app = serverBundle(stores, routerContext, req.url)
+
+      asyncBootstrap(app).then(() => {
+
+        // 如果 routerContext 有 url 则在服务端重定向，要放在 renderToString 后
+        if (routerContext.url) {
+          res.status(302).setHeader('Location', routerContext.url)
+          res.end()
+          return
+        }
+        const state = getStoreState(stores)
+        const content = ReactDomServer.renderToString(app)
+
+        const html = ejs.render(template, {
+          appString: content,
+          initialState: serialize(state) // state 是一个对象，渲染到服务端需要序列化
+        })
+
+        res.send(html)
+        // res.send(template.replace('<!-- slot -->', content))
+      })
+
     })
   })
 }

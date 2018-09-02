@@ -6,17 +6,20 @@ import { Provider } from 'mobx-react'
 import { AppContainer } from 'react-hot-loader'
 
 import App from './views/App'
-import appState from './store/app-state'
+import AppState from './store/app-state'
 
 // 服务端渲染不使用 ReactDom.render
 // ReactDom.hydrate(<App />, document.getElementById('root'))
+
+// eslint-disable-next-line
+const initialState = window.__INITIAL__STATE__ || {}
 
 const root = document.getElementById('root')
 
 const render = Component => {
   ReactDom.hydrate(
     <AppContainer>
-      <Provider appState={appState}>
+      <Provider appState={new AppState(initialState.appState)}>
         <BrowserRouter>
           <Component />
         </BrowserRouter>

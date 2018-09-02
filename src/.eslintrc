@@ -21,6 +21,7 @@
     "no-console": [0],
     "react/destructuring-assignment": [0],
     "no-trailing-spaces": [0],
-    "react/require-default-props": [0]
+    "react/require-default-props": [0],
+    "arrow-body-style": [0]
   }
 }

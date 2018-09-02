@@ -8,10 +8,15 @@ import {
   action
 } from 'mobx'
 
-export class AppState {
-  @observable count = 0
+export default class AppState {
+  constructor({ count, name } = { count: 0, name: 'yishibakaien' }) {
+    this.count = count
+    this.name = name
+  }
 
-  @observable name = 'yishibakaien'
+  @observable count
+
+  @observable name
 
   @computed get msg() {
     return `${this.name} say count is ${this.count}`
@@ -24,16 +29,12 @@ export class AppState {
   @action changeName = (name) => {
     this.name = name
   }
+
+  // 用在 服务端渲染的时候，将服务端渲染的数据以 JSON 的形式拿到
+  toJson() {
+    return {
+      count: this.count,
+      name: this.name
+    }
+  }
 }
-
-const appState = new AppState()
-
-// autorun(() => {
-//   console.log(appState.msg)
-// })
-
-// setInterval(() => {
-//   appState.add()
-// }, 1000)
-
-export default appState
