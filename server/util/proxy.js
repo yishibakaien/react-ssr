@@ -22,14 +22,16 @@ module.exports = function(req, res, next) {
     return
   }
 
-  const query = Object.assign({}, req.query)
+  const query = Object.assign({}, req.query, {
+    accesstoken: (needAccessToken && req.method.toUpperCase() === 'GET') ? user.accessToken : ''
+  })
   if (query.needAccessToken) delete query.needAccessToken
 
   axios(`${baseUrl}${path}`, {
     method: req.method,
     params: query,
     data: queryString.stringify(Object.assign({}, req.body, {
-      accesstoken: user.accessToken
+      accesstoken: (needAccessToken && req.method.toUpperCase() === 'POST') ? user.accessToken : ''
     })),
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
