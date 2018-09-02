@@ -12,10 +12,10 @@ const ejs = require('ejs')
 const serialize = require('serialize-javascript')
 
 // 这个包是使用 export 这种形式去开发的
-const asyncBootstrap = require('react-async-bootstrapper')
+const bootstrap = require('react-async-bootstrapper')
 const ReactDomServer = require('react-dom/server')
 
-// console.log('asyncBootstrap', asyncBootstrap)
+// console.log('bootstrap', bootstrap)
 
 const serverConfig = require('../../build/webpack.config.server')
 
@@ -29,7 +29,23 @@ const getTemplate = () => {
   })
 }
 
-const Module = module.constructor
+// const Module = module.constructor
+const NativeModule = require('module')
+const vm = require('vm')
+
+const getModuleFromString = (bundle, filename) => {
+  const m = { exports: {} }
+  const wrapper = NativeModule.wrap(bundle)
+  const script = new vm.Script(wrapper, {
+    filename,
+    dispalyErrors: true
+  })
+
+  const result = script.runInThisContext()
+  result.call(m.exports, m.exports, require, m)
+
+  return m
+}
 
 const mfs = new MemoryFs()
 
@@ -54,8 +70,10 @@ serverCompliler.watch({}, (err, stats) => {
   const bundle = mfs.readFileSync(bundlePath, 'utf8')
   
   // hack 操作，将 webpack 输出的字符串转换为模块
-  const m = new Module()
-  m._compile(bundle, 'server-entry.js') // 必须制定文件名
+  // const m = new Module()
+  // m._compile(bundle, 'server-entry.js') // 必须制定文件名
+
+  const m = getModuleFromString(bundle, 'server-entry.js')
 
   // 获取 m 暴露的模块
   serverBundle = m.exports.default
@@ -87,7 +105,7 @@ module.exports = function(app) {
       const stores = createStoreMap()
       const app = serverBundle(stores, routerContext, req.url)
 
-      asyncBootstrap(app).then(() => {
+      bootstrap(app).then(() => {
 
         // 如果 routerContext 有 url 则在服务端重定向，要放在 renderToString 后
         if (routerContext.url) {

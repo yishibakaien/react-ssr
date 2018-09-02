@@ -12,5 +12,7 @@ module.exports = webpackMerge(baseConfig, {
   output: {
     filename: 'server-entry.js',
     libraryTarget: 'commonjs2'
-  }
+  },
+  // 不把这些模块打包进去
+  externals: Object.keys(require('../package.json').dependencies)
 })

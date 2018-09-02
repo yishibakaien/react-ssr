@@ -20,7 +20,7 @@ class TopicList extends React.Component {
 
   componentDidMount() {}
 
-  asyncBootstrap() {
+  bootstrap() {
     return new Promise(resolve => {
       setTimeout(() => {
         this.props.appState.count = 3
