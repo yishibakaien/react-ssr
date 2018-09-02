@@ -1,10 +1,12 @@
 const express = require('express')
 const favicon = require('serve-favicon')
-const ReactSSR = require('react-dom/server')
+// const ReactSSR = require('react-dom/server')
 const bodyParser = require('body-parser')
 const session = require('express-session')
 const fs = require('fs')
 const path = require('path')
+
+const serverRender = require('./util/server-render')
 
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -37,22 +39,26 @@ if (!isDev) {
    * 这里是由于使用 commonjs2 
    * 所以加了 default 
    */
-  const serverEntry = require('../dist/server-entry').default
+  const serverEntry = require('../dist/server-entry')
 
   // 用 utf8 来指定读出的文件是个 string 否则默认为 buffer
-  const template = fs.readFileSync(path.join(__dirname, '../dist/index.html'), 'utf8')
+  const template = fs.readFileSync(path.join(__dirname, '../dist/server.ejs'), 'utf8')
 
   app.use('/public', express.static(path.join(__dirname, '../dist')))
   
-  app.get('*', function(req, res) {
-    const appString = ReactSSR.renderToString(serverEntry)
-    const temp = template.replace('<!-- slot -->', appString)
-    res.send(temp)
+  app.get('*', function(req, res, next) {
+    serverRender(serverEntry, template, req, res).catch(next)
   })
 } else {
   const devStatic = require('./util/dev-static.js')
   devStatic(app)
 }
+
+// express 处理全局错误中间件，必须传 4 个参数
+app.use(function(err, req, res, next) {
+  console.log(err),
+  res.status(500).send(err)
+})
 
 app.listen(3333, function() {
   console.log('server is listening on 3333')

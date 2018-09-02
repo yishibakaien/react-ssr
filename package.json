@@ -11,7 +11,8 @@
     "clean": "rimraf dist",
     "build": "npm run clean && npm run build:client && npm run build:server",
     "lint": "eslint --ext .js --ext .jsx src/",
-    "precommit": "npm run lint"
+    "precommit": "npm run lint",
+    "start": "cross-env NODE_ENV=production node server/server.js"
   },
   "keywords": [
     "react",
