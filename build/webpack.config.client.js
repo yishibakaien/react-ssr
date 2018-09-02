@@ -42,7 +42,8 @@ if (isDev) {
       index: '/public/index.html'
     },
     proxy: {
-      '/api': 'http://localhost:3333'
+      '/api': 'http://localhost:3333',
+      changeOrigin: true
     }
   }
   config.plugins.push(new webpack.HotModuleReplacementPlugin())

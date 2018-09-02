@@ -27,7 +27,8 @@ export default class TestApi extends React.Component {
   }
 
   markAll() {
-    axios.post('/api/message/mark_all?needAccessToken=true').then(res => {
+    axios.post('/api/message/mark_all?needAccessToken=true')
+      .then(res => {
         console.log(res)
       })
       .catch(err => {

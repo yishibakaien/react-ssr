@@ -3,13 +3,14 @@
 const router = require('express').Router()
 const axios = require('axios')
 
-const baseUrl = 'http://cnodejs.org/api/v1'
+const baseUrl = 'https://cnodejs.org/api/v1'
 
 router.post('/login', function(req, res, next) {
   axios.post(`${baseUrl}/accesstoken`, {
     accesstoken: req.body.accessToken
   })
     .then(resp => {
+      // console.log('success', resp)
       if (resp.status === 200 && resp.data.success) {
         req.session.user = {
           accessToken: req.body.accessToken,
@@ -18,17 +19,17 @@ router.post('/login', function(req, res, next) {
           avatarUrl: resp.data.avatar_url
         }
         res.json({
-          success: true,
+          sucess: true,
           data: resp.data
         })
       }
     })
     .catch(err => {
+      // console.log('err', err.response)
       if (err.response) {
-        // 业务逻辑错误，不是服务器错误
         res.json({
           success: false,
-          data: err.response
+          data: err.response.data
         })
       } else {
         next(err)
