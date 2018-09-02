@@ -4,12 +4,12 @@ const webpack = require('webpack')
 
 // api 与 fs 模块一致，它从内存中读取数据
 const MemoryFs = require('memory-fs')
-
 const proxy = require('http-proxy-middleware')
-
 const ejs = require('ejs')
-
 const serialize = require('serialize-javascript')
+
+// 用于给模板添加 title meta 等
+const Helmet = require('react-helmet').default
 
 // 这个包是使用 export 这种形式去开发的
 const bootstrap = require('react-async-bootstrapper')
@@ -113,12 +113,18 @@ module.exports = function(app) {
           res.end()
           return
         }
+        const helmet = Helmet.rewind()
+
         const state = getStoreState(stores)
         const content = ReactDomServer.renderToString(app)
 
         const html = ejs.render(template, {
           appString: content,
-          initialState: serialize(state) // state 是一个对象，渲染到服务端需要序列化
+          initialState: serialize(state), // state 是一个对象，渲染到服务端需要序列化
+          meta: helmet.meta.toString(),
+          title: helmet.title.toString(),
+          style: helmet.style.toString(),
+          link: helmet.style.toString()
         })
 
         res.send(html)
