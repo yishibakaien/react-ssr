@@ -16,7 +16,8 @@ import AppState from './store/app-state'
 
 const theme = createMuiTheme({
   palette: {
-    primary: blue
+    primary: blue,
+    type: 'light'
   }
 })
 
@@ -25,6 +26,23 @@ const theme = createMuiTheme({
 
 // eslint-disable-next-line
 const initialState = window.__INITIAL__STATE__ || {}
+
+const createApp = TheApp => {
+  class Main extends React.Component {
+  // Remove the server-side injected CSS.
+    componentDidMount() {
+      const jssStyles = document.getElementById('jss-server-side');
+      if (jssStyles && jssStyles.parentNode) {
+        jssStyles.parentNode.removeChild(jssStyles);
+      }
+    }
+
+    render() {
+      return <TheApp />
+    }
+  }
+  return Main
+}
 
 const root = document.getElementById('root')
 
@@ -43,7 +61,7 @@ const render = Component => {
   )
 }
 
-render(App)
+render(createApp(App))
 
 /**
  * 热替换相关配置
@@ -52,6 +70,6 @@ if (module.hot) {
   module.hot.accept('./views/App', () => {
     // eslint-disable-next-line
     const NextApp = require('./views/App').default
-    render(NextApp)
+    render(createApp(NextApp))
   })
 }

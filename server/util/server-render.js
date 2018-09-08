@@ -8,6 +8,17 @@ const ReactDomServer = require('react-dom/server')
 // 用于给模板添加 title meta 等
 const Helmet = require('react-helmet').default
 
+// 服务端渲染 jss 相关配置
+const SheetsRegistry = require('react-jss').SheetsRegistry
+const create = require('jss').create
+const preset = require('jss-preset-default').default
+const createMuiTheme = require('@material-ui/core/styles').createMuiTheme
+const createGenerateClassName = require('@material-ui/core/styles/createGenerateClassName').default
+const colors = require('@material-ui/core/colors')
+
+// console.log(SheetsRegistry)
+// console.log(create)
+// console.log(preset)
 
 const getStoreState = (stores) => {
   return Object.keys(stores).reduce((result, storeName) => {
@@ -24,7 +35,18 @@ module.exports = (bundle, template, req, res) => {
     const routerContext = {}
     const stores = createStoreMap()
 
-    const app = createApp(stores, routerContext, req.url)
+    // 服务端渲染 jss 相关配置
+    const sheetsRegistry = new SheetsRegistry()
+    const jss = create(preset())
+    jss.options.createGenerateClassName = createGenerateClassName
+    const theme = createMuiTheme({
+      palette: {
+        primary: colors.blue,
+        type: 'light'
+      }
+    })
+
+    const app = createApp(stores, routerContext, sheetsRegistry, jss, theme, req.url)
 
     bootstrap(app).then(() => {
 
@@ -45,7 +67,9 @@ module.exports = (bundle, template, req, res) => {
         meta: helmet.meta.toString(),
         title: helmet.title.toString(),
         style: helmet.style.toString(),
-        link: helmet.style.toString()
+        link: helmet.style.toString(),
+
+        materialCss: sheetsRegistry.toString()
       })
 
       res.send(html)
