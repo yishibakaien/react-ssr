@@ -6,19 +6,17 @@ import { Provider } from 'mobx-react'
 import { AppContainer } from 'react-hot-loader'
 
 // 创建主题，与主题颜色
-import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles'
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 
 // 引入主题色
-import { lightBlue, pink } from 'material-ui/colors'
+import blue from '@material-ui/core/colors/blue'
 
 import App from './views/App'
 import AppState from './store/app-state'
 
 const theme = createMuiTheme({
   palette: {
-    primary: lightBlue,
-    accent: pink,
-    type: 'light'
+    primary: blue
   }
 })
 
