@@ -5,8 +5,22 @@ import { Provider } from 'mobx-react'
 // eslint-disable-next-line
 import { AppContainer } from 'react-hot-loader'
 
+// 创建主题，与主题颜色
+import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles'
+
+// 引入主题色
+import { lightBlue, pink } from 'material-ui/colors'
+
 import App from './views/App'
 import AppState from './store/app-state'
+
+const theme = createMuiTheme({
+  palette: {
+    primary: lightBlue,
+    accent: pink,
+    type: 'light'
+  }
+})
 
 // 服务端渲染不使用 ReactDom.render
 // ReactDom.hydrate(<App />, document.getElementById('root'))
@@ -21,7 +35,9 @@ const render = Component => {
     <AppContainer>
       <Provider appState={new AppState(initialState.appState)}>
         <BrowserRouter>
-          <Component />
+          <MuiThemeProvider theme={theme}>
+            <Component />
+          </MuiThemeProvider>
         </BrowserRouter>
       </Provider>
     </AppContainer>,
